@@ -25,6 +25,7 @@ int size = 0;
 int clock = 0;
 key_t KeyToKernel;
 char process_number[10];
+char file_name[15]="process ";
 struct job jobs[100];
 struct toKernel toKernel_Q;
 
@@ -74,7 +75,9 @@ int main(int argc, char *argv[])
     KeyToKernel = temp;
     strcpy(process_number,argv[2]);
 
-    read_all_instructions(strcat("process ", process_number));
+    strcat(file_name,process_number);
+    strcat(file_name,".txt");
+    read_all_instructions(file_name);
     sortJobs();
 
     while (size > 0)
