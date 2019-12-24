@@ -13,6 +13,7 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <unordered_map>
+#include <fstream>
 using namespace std;
 struct Instruction {
     long mtype;
@@ -36,6 +37,7 @@ int finishTime;
 int clkMain = 0;
 char beingserved = 'Z';
 unordered_map<int, int> childrenPid;
+ofstream fout;
 void terminates(int dummy)
 {
     int status;
@@ -43,6 +45,7 @@ void terminates(int dummy)
     if (pid != diskID) {
         aliveProcesses--;
         cout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
+	fout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
     }
 }
 
@@ -50,6 +53,7 @@ void foralarm(int dummy)
 {
     clkMain++;
     cout << "\t\t\t\tTime now is " << clkMain << endl;
+    fout << "\t\t\t\tTime now is " << clkMain << endl;
     killpg(getpgrp(), SIGUSR2);
     alarm(1);
     //signal(SIGALRM,foralarm);
@@ -60,6 +64,7 @@ int main(int argc, char** argv)
         cout << "error in entering";
         return 0;
     }
+    fout.open("log.txt");
     // will put num of process from arg
     string var1 = argv[1];
     int numProcess = stoi(var1);
@@ -107,7 +112,8 @@ int main(int argc, char** argv)
     }
 
     // we have to log everything
-
+    cout << "\t\t\t\tTime now is " << clkMain << endl;
+    fout << "\t\t\t\tTime now is " << clkMain << endl;
     msgctl(KeyFromProcess, IPC_STAT, &buf);
     num_messages = buf.msg_qnum;
     msgctl(KeyToDisk, IPC_STAT, &buf);
@@ -121,9 +127,15 @@ int main(int argc, char** argv)
             int rec_val;
             if (clkMain == finishTime) {
                 if (beingserved == 'A')
+		{
                     cout << "Adding Operation ends at Time " << clkMain << endl;
+		    fout << "Adding Operation ends at Time " << clkMain << endl;
+		}
                 else if (beingserved == 'D')
+		{
                     cout << "Deleting Operation ends at Time " << clkMain << endl;
+		    fout << "Deleting Operation ends at Time " << clkMain << endl;
+		}
                 beingserved = 'Z';
             }
             if (clkMain < finishTime)
@@ -152,6 +164,7 @@ int main(int argc, char** argv)
                         int send_val = msgsnd(KeyToDisk, &Instruction_Q, sizeof(Instruction_Q) - sizeof(Instruction_Q.mtype), !IPC_NOWAIT);
                         beingserved = 'A';
                         cout << "Add operation sent to disk to be served at time " << clkMain << endl;
+			fout << "Add operation sent to disk to be served at time " << clkMain << endl;
                         if (send_val == -1)
                             perror("Errror in send to addd");
                         finishTime = clkMain + 3;
@@ -164,6 +177,7 @@ int main(int argc, char** argv)
                         perror("Errror in send to delete");
                     beingserved = 'D';
                     cout << "Delete operation sent to disk to be served at time " << clkMain << endl;
+		    fout << "Delete operation sent to disk to be served at time " << clkMain << endl;
                     finishTime = clkMain + 1;
                 }
                 alarm(1);
@@ -173,4 +187,7 @@ int main(int argc, char** argv)
     kill(diskID, SIGKILL);
     cout << "disk is terminating at " << clkMain << endl;
     cout << "kernel is terminating at " << clkMain << endl;
+    fout << "disk is terminating at " << clkMain << endl;
+    fout << "kernel is terminating at " << clkMain << endl;
+    fout.close();
 }

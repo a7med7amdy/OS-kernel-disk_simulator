@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <fstream>
 using namespace std;
 
 struct fromKernel {
@@ -26,6 +27,7 @@ key_t keyToKernel;
 struct toKernel toKernel_Q;
 struct fromKernel fromKernel_Q;
 struct msqid_ds buf;
+ofstream fout;
 
 void inserting(string message)
 {
@@ -64,6 +66,7 @@ void countFree(int dummy)
 
 int main(int argc, char** argv)
 {
+    fout.open("log.txt");
     toKernel_Q.freeSpace = 10;
     string var1 = argv[0];
     string var2 = argv[1];
@@ -84,6 +87,7 @@ int main(int argc, char** argv)
             if (fromKernel_Q.operation == 'A') {
                 inserting(fromKernel_Q.text);
                 cout << "Disk starts to add at time " << clk << endl;
+		fout << "Disk starts to add at time " << clk << endl;
 		pause();
             }
             else {
@@ -91,8 +95,10 @@ int main(int argc, char** argv)
                 int ID = stoi(tempStr);
                 removing(ID);
                 cout << "Disk starts to delete at time " << clk << endl;
+		fout << "Disk starts to delete at time " << clk << endl;
 		pause();
             }
         }
     }
+    fout.close();
 }
