@@ -84,12 +84,14 @@ int main(int argc, char** argv)
             if (fromKernel_Q.operation == 'A') {
                 inserting(fromKernel_Q.text);
                 cout << "Disk starts to add at time " << clk << endl;
+		pause();
             }
             else {
                 string tempStr(fromKernel_Q.text);
                 int ID = stoi(tempStr);
                 removing(ID);
                 cout << "Disk starts to delete at time " << clk << endl;
+		pause();
             }
         }
     }
