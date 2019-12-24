@@ -1,5 +1,5 @@
 Disk
 process
-*.out
+*out
 Kernel
 *.vscode
