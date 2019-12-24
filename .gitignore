@@ -1,5 +1,5 @@
-Disk
+disk
 process
-*out
-Kernel
+main
+*.txt
 *.vscode
