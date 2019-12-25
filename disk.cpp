@@ -43,7 +43,7 @@ void inserting(string message)
 
 void removing(int ID)
 {
-    if (ID >= 0 && ID <= 9) {
+    if (ID >= 0 && ID <= 9 && full[ID]) {
         full[ID] = false;
         toKernel_Q.freeSpace++;
         storge[ID] = ' ';
