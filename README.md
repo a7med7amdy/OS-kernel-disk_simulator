@@ -21,8 +21,28 @@ chmod +x compile.sh
  ```
  ./main 2
  ```
+ - you have to generate process files with the following format:
+ ```
+ processNUM.txt
+ ```
+ #### Example
+ ```
+ process0.txt
  
+ process1.txt
+ ```
+ #### Format
+ 
+ ```
+ TIMESTEP OPERATION TEXT
+ ```
+ #### Example
+ ```
+ 5 A HELLO WORLD
+ 7 D 0
+ ```
  ## ARCHITECTURE SCHEME
  
  ![ARCHITECTURE SCHEME](/scheme.png)
+
 
