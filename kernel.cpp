@@ -1,3 +1,20 @@
+// #include <iostream>
+// #include <fstream>
+// #include <ostream>
+// #include <string>
+// #include <vector>
+// #include <algorithm>
+// #include <sys/wait.h>
+// #include <unistd.h>
+// #include<signal.h>
+// #include <cstring>
+// #include <sstream>
+// #include <csignal>
+// #include <sys/types.h>
+// #include <sys/ipc.h>
+// #include <sys/msg.h>
+// #include <unordered_map>
+// #include <fstream>
 #include <iostream>
 #include <fstream>
 #include <ostream>
@@ -7,13 +24,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <cstring>
+//#include <signal.h>
 #include <sstream>
 #include <csignal>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <unordered_map>
-#include <fstream>
 using namespace std;
 struct Instruction {
     long mtype;
@@ -40,14 +57,60 @@ unordered_map<int, int> childrenPid;
 ofstream fout;
 void terminates(int dummy)
 {
+
+    pid_t p;
     int status;
-    pid_t pid = wait(NULL);
-    if (pid != diskID) {
-        aliveProcesses--;
-        cout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
-	fout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
+
+    /* loop as long as there are children to process */
+    while (1) {
+
+       /* retrieve child process ID (if any) */
+       p = waitpid(-1, &status, WNOHANG);
+
+       /* check for conditions causing the loop to terminate */
+       if (p == -1) {
+           /* continue on interruption (EINTR) */
+           if (errno == EINTR) {
+               continue;
+           }
+           /* break on anything else (EINVAL or ECHILD according to manpage) */
+           break;
+       }
+       else if (p == 0) {
+           /* no more children to process, so break */
+           break;
+       }
+
+       /* valid child process ID retrieved, process accordingly */
+    if(p==diskID){cout<<"here"<<endl;};
+        if (p != diskID) {
+            aliveProcesses--;
+            cout << "PROCESS NUM " << childrenPid[p] + 1 << " TERMINATES" << endl;
+	        fout << "PROCESS NUM " << childrenPid[p] + 1 << " TERMINATES" << endl;
     }
+       
 }
+    // while(1){
+ 	// 	int pid, stat_loc;
+
+ 	// 	pid = wait(NULL);
+ 	// 	if(pid==diskID){cout<<"here"<<endl;};
+    //     if (pid != diskID) {
+    //         aliveProcesses--;
+    //         cout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
+	//         fout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
+    // }
+
+
+//    int status;
+//     pid_t pid = wait(NULL);
+//     if (pid != diskID) {
+//         aliveProcesses--;
+//         cout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
+// 	fout << "PROCESS NUM " << childrenPid[pid] + 1 << " TERMINATES" << endl;
+//     }
+}
+// }
 
 void foralarm(int dummy)
 {

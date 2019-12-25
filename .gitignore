@@ -3,3 +3,4 @@ process
 main
 *.txt
 *.vscode
+a.out
